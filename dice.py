@@ -98,24 +98,5 @@ def roll_dice(rolls:int,sides:int):
         result += random.randint(1, sides)
     return result
 
-@bot.event
-async def on_member_join(member):
-    role_name = "member"  # サーバー内で設定したいロール名
-    guild = member.guild
-
-    role = discord.utils.get(guild.roles, name=role_name)
-    
-    if role is not None:
-        try:
-            # ロールを付与
-            await member.add_roles(role)
-            print(f"Role {role_name} has been granted to {member.name}")
-        except discord.Forbidden:
-            print("Permission error: role cannot be granted.")
-        except discord.HTTPException as e:
-            print(f"HTTP error: {e}")
-    else:
-        print(f"Role '{role_name}' was not been found.")
-
 # ボットの実行
 bot.run(token)
