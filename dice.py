@@ -98,5 +98,11 @@ def roll_dice(rolls:int,sides:int):
         result += random.randint(1, sides)
     return result
 
-# ボットの実行
+@bot.command()
+async def ping(ctx):
+    if ctx.author.bot:
+        return
+    file = os.path.basename(__file__)
+    await ctx.reply(f"pong [{file}]")
+
 bot.run(token)

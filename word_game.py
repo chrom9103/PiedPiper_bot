@@ -1027,5 +1027,11 @@ async def wd(ctx,cmd:str):
     if cmd == "help":
         await ctx.send("```?set [word2:str]\n?attack [相手:int] [word1] [word2]\n?bomb [相手:int]\n?check [word1or2:int]\n?defence\n?eat\n?feint [相手:int]\n?status```")
 
+@bot.command()
+async def ping(ctx):
+    if ctx.author.bot:
+        return
+    file = os.path.basename(__file__)
+    await ctx.reply(f"pong [{file}]")
 
 bot.run(token)

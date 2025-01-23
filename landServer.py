@@ -82,4 +82,11 @@ async def job():
     else:
         print(f"Guild with ID '{guild_id}' not found.")
 
+@bot.command()
+async def ping(ctx):
+    if ctx.author.bot:
+        return
+    file = os.path.basename(__file__)
+    await ctx.reply(f"pong [{file}]")
+
 bot.run(token)

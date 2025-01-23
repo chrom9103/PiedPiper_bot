@@ -172,4 +172,11 @@ async def export(ctx, limit: int = 100):
 
     await ctx.send(f"{limit} 件のメッセージを {LOG_FILE} にエクスポートしました。")
 
+@bot.command()
+async def ping(ctx):
+    if ctx.author.bot:
+        return
+    file = os.path.basename(__file__)
+    await ctx.reply(f"pong [{file}]")
+
 bot.run(token)

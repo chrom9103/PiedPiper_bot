@@ -39,5 +39,11 @@ async def on_voice_state_update(member, before, after):
             if channel and notify_member:
                 await channel.send(f"{notify_member.mention}  {member.name} was joining {after.channel.name} に参加しました！")
 
-# Botのトークンを入力
+@bot.command()
+async def ping(ctx):
+    if ctx.author.bot:
+        return
+    file = os.path.basename(__file__)
+    await ctx.reply(f"pong [{file}]")
+
 bot.run(token)
