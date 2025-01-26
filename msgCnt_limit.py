@@ -18,7 +18,7 @@ async def fetch_message_counts():
 
     @client.event
     async def on_ready():
-        print(f'Logged in as {client.user}')
+        print("Cleared to take off!")
         guild = discord.utils.get(client.guilds)  # 最初のサーバーを取得
 
         if not guild:

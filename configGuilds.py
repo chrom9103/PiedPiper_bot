@@ -61,11 +61,11 @@ async def deleteProject(ctx,name:str):
         role = discord.utils.get(guild.roles, name=name)
         category = discord.utils.get(guild.categories, name=name)
 
-        # カテゴリ内ch,カテゴリ,ロールを削除
-        for channel in category.channels:
-            await channel.delete()
-        await category.delete()
-        await role.delete()
+        # for channel in category.channels:
+        #     await channel.delete()
+        # await category.delete()
+        # await role.delete()
+        role.delete()
 
         await ctx.channel.send(f"Project：{name} was completed.")
     else:
