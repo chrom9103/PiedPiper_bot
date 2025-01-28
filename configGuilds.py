@@ -30,7 +30,7 @@ async def newProject(ctx,name:str,*members:discord.Member):
     
     guild = ctx.guild
 
-    if not canCreate(guild, name):
+    if not isCreateable(guild, name):
         await ctx.channel.send("Name must be unique and not a mention.")
         return
 
@@ -190,7 +190,7 @@ def isProject(guild:discord.Guild, name:str):
 
     return False
 
-def canCreate(guild:discord.Guild, name:str):
+def isCreateable(guild:discord.Guild, name:str):
 
     pattern = r'^<@(\d+)$'
     match = re.match(pattern, name)
