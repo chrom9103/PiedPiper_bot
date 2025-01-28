@@ -61,13 +61,33 @@ async def deleteProject(ctx,name:str):
         role = discord.utils.get(guild.roles, name=name)
         category = discord.utils.get(guild.categories, name=name)
 
-        # for channel in category.channels:
-        #     await channel.delete()
-        # await category.delete()
-        # await role.delete()
-        role.delete()
+        try:
 
-        await ctx.channel.send(f"Project：{name} was completed.")
+            #Project用ロールを削除
+            await role.delete()
+            #権限設定を変更
+            role = discord.utils.get(guild.roles, name="member")
+            overwrites = {
+            guild.default_role: discord.PermissionOverwrite(view_channel=False),
+            role: discord.PermissionOverwrite(
+                view_channel=True,
+                send_messages=False,
+                send_messages_in_threads=False,
+                create_public_threads=False,
+                connect=False)
+            }
+            for channel in category.channels:
+                await channel.edit(overwrites=overwrites, sync_permissions=True) #カテゴリと同期
+                print(f"{channel}")
+            #カテゴリ名をお蔵入りに
+            await category.edit(name="【お蔵】" + name, overwrites=overwrites, end=True)
+            
+            await ctx.channel.send(f"Project：{name} was completed.")
+
+        except discord.Forbidden:
+            await ctx.send("The bot does not have permission to edit this channel.")
+        except discord.HTTPException as e:
+            await ctx.send(f"An error has occurred: {e}")
     else:
         await ctx.channel.send(f"{name} was not been found.")
 
@@ -143,15 +163,17 @@ async def setVCstatus(ctx,name:str):
     except discord.HTTPException as e:
         await ctx.send(f"An error has occurred: {e}")
 
-def isProject(guild: discord.Guild, name: str) -> bool:
+def isProject(guild:discord.Guild, name:str):
     role = discord.utils.get(guild.roles, name=name)
     category = discord.utils.get(guild.categories, name=name)
 
     if role is None or category is None or role.color != discord.Color.default():
+        print("role ot category not mutch")
         return False
 
     overwrites = category.overwrites
     if role in overwrites and any(value is not None for value in overwrites[role]):
+        print("overwrites is set")
         return True
 
     return False
