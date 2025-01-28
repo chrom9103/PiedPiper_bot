@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import os
 from dotenv import load_dotenv
+import re
 
 intents = discord.Intents.all()
 intents.messages = True
@@ -27,14 +28,17 @@ async def newProject(ctx,name:str,*members:discord.Member):
     if ctx.author.bot:
         return
     
+    guild = ctx.guild
+
+    if not canCreate(guild, name):
+        await ctx.channel.send("Name must be unique and not a mention.")
+        return
+
     member_list = list(members)
 
     if len(member_list) < 2:
         await ctx.channel.send("A project must have at least two members.")
         return
-
-    # Guildオブジェクトの取得
-    guild = ctx.guild
     
     role = await guild.create_role(name=name)
     for member in member_list:
@@ -50,14 +54,9 @@ async def newProject(ctx,name:str,*members:discord.Member):
     await guild.create_text_channel("会議室", category=category)
     await guild.create_voice_channel("VC", category=category)
 
-    target_channel = discord.utils.get(guild.channels, name="管理者") #実験用環境のカテゴリid
-    
+    target_channel = discord.utils.get(guild.channels, name="管理者")
     if target_channel:
-        # チャンネルを指定されたチャンネルの直下に移動
         await category.edit(position=target_channel.position + 1, after=target_channel)
-
-        # 完了メッセージの送信
-        await ctx.channel.send(f"Project: {name} was completed.")
     else:
         await ctx.channel.send("The target channel was not found.")
 
@@ -89,7 +88,6 @@ async def deleteProject(ctx,name:str):
             }
             for channel in category.channels:
                 await channel.edit(overwrites=overwrites, sync_permissions=True) #カテゴリと同期
-                print(f"{channel}")
             #カテゴリ名をお蔵入りに
             await category.edit(name="【お蔵】" + name, overwrites=overwrites)
             all_categories = guild.categories
@@ -191,6 +189,19 @@ def isProject(guild:discord.Guild, name:str):
         return True
 
     return False
+
+def canCreate(guild:discord.Guild, name:str):
+
+    pattern = r'^<@(\d+)$'
+    match = re.match(pattern, name)
+    if match:
+        return False
+    
+    for category in guild.categories:
+        if category.name == name:
+            return False
+    
+    return True
 
 @bot.command()
 async def export(ctx, limit: int = 100):
