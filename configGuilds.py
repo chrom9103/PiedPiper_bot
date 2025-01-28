@@ -50,6 +50,17 @@ async def newProject(ctx,name:str,*members:discord.Member):
     await guild.create_text_channel("会議室", category=category)
     await guild.create_voice_channel("VC", category=category)
 
+    target_channel = discord.utils.get(guild.channels, name="管理者") #実験用環境のカテゴリid
+    
+    if target_channel:
+        # チャンネルを指定されたチャンネルの直下に移動
+        await category.edit(position=target_channel.position + 1, after=target_channel)
+
+        # 完了メッセージの送信
+        await ctx.channel.send(f"Project: {name} was completed.")
+    else:
+        await ctx.channel.send("The target channel was not found.")
+
 @bot.command()
 async def deleteProject(ctx,name:str):
     if ctx.author.bot:
@@ -80,7 +91,10 @@ async def deleteProject(ctx,name:str):
                 await channel.edit(overwrites=overwrites, sync_permissions=True) #カテゴリと同期
                 print(f"{channel}")
             #カテゴリ名をお蔵入りに
-            await category.edit(name="【お蔵】" + name, overwrites=overwrites, end=True)
+            await category.edit(name="【お蔵】" + name, overwrites=overwrites)
+            all_categories = guild.categories
+            highest_position = max([category.position for category in all_categories], default=0)
+            await category.edit(position=highest_position + 1)
             
             await ctx.channel.send(f"Project：{name} was completed.")
 
