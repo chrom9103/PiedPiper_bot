@@ -35,7 +35,7 @@ async def job():
     print(datetime.datetime.now())
     print("I'm working...")
 
-    guild_id = 1327102300690448385  # 対象サーバーID
+    guild_id = 1005875545885646938 #対象サーバーID
     role_names = ["member", "pre_member"]  # 権限を変更するロール名リスト
 
     guild = bot.get_guild(guild_id)
@@ -55,10 +55,14 @@ async def job():
                 print(f"Permissions for '{role_name}' have been updated.")
             else:
                 print(f"Role '{role_name}' not found.")
+
+        notification_channel_id = 1333641933062410293
+        channel = bot.get_channel(notification_channel_id)
+        await channel.send(f"このサーバーは閉鎖されました。以降は新サーバーを使用します。")
     else:
         print(f"Guild with ID '{guild_id}' not found.")
     
-    guild_id =1327101890403504238   # 対象サーバーID（適切なIDに置き換えてください）
+    guild_id = 1304058364560543815 #対象サーバーID
     role_names = ["pre-member", "member"]  # 権限を変更するロール名リスト
 
     guild = bot.get_guild(guild_id)
@@ -79,6 +83,11 @@ async def job():
                 print(f"Permissions for '{role_name}' have been updated.")
             else:
                 print(f"Role '{role_name}' not found.")
+
+        notification_channel_id = 1304085467838419007
+        channel = bot.get_channel(notification_channel_id)
+        await channel.send(f"Hello, world!")
+
     else:
         print(f"Guild with ID '{guild_id}' not found.")
 
