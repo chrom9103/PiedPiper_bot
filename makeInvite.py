@@ -10,7 +10,7 @@ intents = discord.Intents.default()
 intents.guilds = True
 intents.members = True
 intents.voice_states = True
-intents.messages = True
+intents.message_content = True
 
 bot = commands.Bot(
     command_prefix="?",
@@ -28,18 +28,21 @@ async def on_ready():
 @bot.command()
 async def mkivt(ctx):
     if ctx.author.bot:
-        role_id = 1304058655502503977
-        role = discord.utils.get(ctx.guild.roles, id=role_id)
-        print(role)
-        if role not in ctx.author.roles:
-            await ctx.reply("Permission error")
-            if ctx.channel.id != 1342861713300521051:
-                await ctx.reply("You cannot use this command in this channel.")
-                return
-        
-        print("Creating invite link...")
+        return
 
-    invite = await ctx.channel.create_invite(max_uses=1, max_age=0, reason=f"By {ctx.name}", target_user=ctx.author )
+    role_id = 1304058655502503977
+    role = discord.utils.get(ctx.guild.roles, id=role_id)
+    print(role)
+    if role not in ctx.author.roles:
+        await ctx.reply("Permission error")
+        return
+
+    if ctx.channel.id != 1342861713300521051:
+        await ctx.reply("You cannot use this command in this channel.")
+        return
+
+    print("Creating invite link...")
+    invite = await ctx.channel.create_invite(max_uses=1, max_age=0, reason=f"By {ctx.author.name}")
     await ctx.reply(f"New invite link: {invite.url}")
 
 
