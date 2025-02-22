@@ -20,6 +20,7 @@ bot = commands.Bot(
 
 # 設定
 notification_channel_id = 1327101891628503152  # 通知を送信するチャンネルのID
+used_invites = {}  # 招待リンクを追跡する辞書
 
 @bot.event
 async def on_ready():
@@ -32,7 +33,6 @@ async def mkivt(ctx):
 
     role_id = 1304058655502503977
     role = discord.utils.get(ctx.guild.roles, id=role_id)
-    print(role)
     if role not in ctx.author.roles:
         await ctx.reply("Permission error")
         return
@@ -41,10 +41,11 @@ async def mkivt(ctx):
         await ctx.reply("You cannot use this command in this channel.")
         return
 
-    print("Creating invite link...")
     invite = await ctx.channel.create_invite(max_uses=1, max_age=0, reason=f"By {ctx.author.name}")
     await ctx.reply(f"New invite link: {invite.url}")
 
+    with open("log_list.txt", "a") as log_file:
+        log_file.write(f"Invite ID: {invite.id}. Author: {ctx.author.name}\n")
 
 @bot.command()
 async def ping(ctx):
