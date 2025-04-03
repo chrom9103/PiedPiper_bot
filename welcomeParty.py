@@ -48,6 +48,35 @@ async def mkivt(ctx):
         log_file.write(f"Invite ID: {invite.id}. Author: {ctx.author.name}\n")
 
 @bot.command()
+async def add(ctx, mode:str, *member:discord.Member):
+    if ctx.author.bot:
+        return
+
+    role_id = 1304058655502503977
+    role = discord.utils.get(ctx.guild.roles, id=role_id)
+
+    if role not in ctx.author.roles:
+        await ctx.reply("Permission error")
+        return
+
+    if ctx.channel.id != 1342861713300521051:
+        await ctx.reply("You cannot use this command in this channel.")
+        return
+    
+    try:
+        if mode == "member":
+            member_role = discord.utils.get(ctx.guild.roles, name="member")
+            premember_role = discord.utils.get(ctx.guild.roles, name="pre-member")
+            for user in member:
+                await user.add_roles(member_role)
+                await user.remove_roles(premember_role)
+                print(f"Added {user.name} to {member_role.name}.")
+    except discord.Forbidden:
+        await print("Permission error")
+    except discord.HTTPException as e:
+        await print(f"An error occurred: {e}")
+
+@bot.command()
 async def ping(ctx):
     if ctx.author.bot:
         return
