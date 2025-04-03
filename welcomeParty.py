@@ -63,12 +63,18 @@ async def add(ctx, mode:str, *member:discord.Member):
         await ctx.reply("You cannot use this command in this channel.")
         return
     
-    if mode == "member":
-        member_role_id = 1304058655502503977
-        role = discord.utils.get(ctx.guild.roles, id=member_role_id)
-        for user in member:
-            await user.add_roles(role)
-            await ctx.reply(f"Added {user.name} to {role.name}.")
+    try:
+        if mode == "member":
+            member_role = discord.utils.get(ctx.guild.roles, name="member")
+            premember_role = discord.utils.get(ctx.guild.roles, name="pre-member")
+            for user in member:
+                await user.add_roles(member_role)
+                await user.remove_roles(premember_role)
+                print(f"Added {user.name} to {member_role.name}.")
+    except discord.Forbidden:
+        await print("Permission error")
+    except discord.HTTPException as e:
+        await print(f"An error occurred: {e}")
 
 @bot.command()
 async def ping(ctx):
