@@ -18,10 +18,6 @@ bot = commands.Bot(
     intents=intents
 )
 
-# 設定
-notification_channel_id = 1327101891628503152  # 通知を送信するチャンネルのID
-used_invites = {}  # 招待リンクを追跡する辞書
-
 @bot.event
 async def on_ready():
     print("Cleared to take off!")
