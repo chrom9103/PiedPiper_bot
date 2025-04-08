@@ -28,10 +28,9 @@ async def mkivt(ctx):
         return
 
     role_id = 1304058655502503977
-    notify_member = bot.get_user(role_id)
     role = discord.utils.get(ctx.guild.roles, id=role_id)
     if role not in ctx.author.roles:
-        await ctx.send(f"Permission issue\n{notify_member.mention}  {ctx.author.name} is creating an invite link.")
+        await ctx.send(f"Permission issue\n{role.mention}  {ctx.author.name} is creating an invite link.")
 
     if ctx.channel.id != 1342861713300521051:
         await ctx.reply("You cannot use this command in this channel.")
