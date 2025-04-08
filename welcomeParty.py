@@ -28,9 +28,10 @@ async def mkivt(ctx):
         return
 
     role_id = 1304058655502503977
+    notify_member = bot.get_user(role_id)
     role = discord.utils.get(ctx.guild.roles, id=role_id)
     if role not in ctx.author.roles:
-        await ctx.reply("Permission error")
+        await ctx.send(f"Permission issue\n{notify_member.mention}  {ctx.author.name} is creating an invite link.")
         return
 
     if ctx.channel.id != 1342861713300521051:
@@ -38,7 +39,8 @@ async def mkivt(ctx):
         return
 
     invite = await ctx.channel.create_invite(max_uses=1, max_age=0, reason=f"By {ctx.author.name}")
-    await ctx.reply(f"New invite link: {invite.url}")
+    await ctx.send(f"New invite link: {invite.url}")
+    await ctx.send(f"Invite ID:`{invite.id}` was created by{ctx.author.name}")
 
     with open("log_list.txt", "a") as log_file:
         log_file.write(f"Invite ID: {invite.id}. Author: {ctx.author.name}\n")
