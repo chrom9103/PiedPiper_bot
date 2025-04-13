@@ -51,13 +51,13 @@ async def add(ctx, mode:str, *member:discord.Member):
     role_id = 1304058655502503977
     role = discord.utils.get(ctx.guild.roles, id=role_id)
 
-    if role not in ctx.author.roles:
-        await ctx.reply("Permission error")
-        return
+    # if role not in ctx.author.roles:
+    #     await ctx.reply("Permission error")
+    #     return
 
-    if ctx.channel.id != 1342861713300521051:
-        await ctx.reply("You cannot use this command in this channel.")
-        return
+    # if ctx.channel.id != 1342861713300521051:
+    #     await ctx.reply("You cannot use this command in this channel.")
+    #     return
     
     try:
         if mode == "member":
@@ -67,6 +67,8 @@ async def add(ctx, mode:str, *member:discord.Member):
                 await user.add_roles(member_role)
                 await user.remove_roles(premember_role)
                 print(f"Added {user.name} to {member_role.name}.")
+                with open("addList.txt", "a") as file:
+                    file.write(f"{member}\n")
     except discord.Forbidden:
         await print("Permission error")
     except discord.HTTPException as e:
