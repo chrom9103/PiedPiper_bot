@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
 
 # Botのトークンを環境変数から取得
-load_dotenv('.env')
+load_dotenv('../.env')
 token = os.getenv("TOKEN")
 
 async def fetch_message_counts():
@@ -19,7 +19,7 @@ async def fetch_message_counts():
     @client.event
     async def on_ready():
         print("Cleared to take off!")
-        guild = discord.utils.get(client.guilds)  # 最初のサーバーを取得
+        guild = discord.utils.get(client.guilds, id=1304058364560543815)  # 指定したサーバーIDから取得
 
         if not guild:
             print("No guilds found.")
@@ -30,7 +30,7 @@ async def fetch_message_counts():
         user_message_count = defaultdict(int)  # 各ユーザーの発言数を記録
         
         jst = timezone(timedelta(hours=9))
-        start_date = datetime(2024, 4, 1, tzinfo=jst)
+        start_date = datetime(2025, 4, 1, tzinfo=jst)
 
         for channel in guild.text_channels:
             print(f"Processing channel: {channel.name}")
