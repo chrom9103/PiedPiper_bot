@@ -27,8 +27,14 @@ def create_dice_response(rolls: int, sides: int, limit: int = None, label: str =
         msg = ""
         if result <= limit:
             msg = "成功"
+            if rolls == 1 and sides == 100:
+                if result <= 5:
+                    msg = "決定的成功/スペシャル"
         else:
             msg = "失敗"
+            if rolls == 1 and sides == 100:
+                if result >= 96:
+                    msg = "致命的失敗"
         
         # 【LABEL】がある場合はそれを追加
         if label:
