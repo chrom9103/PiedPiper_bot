@@ -38,7 +38,7 @@ async def mkivt(ctx):
 
     invite = await ctx.channel.create_invite(max_uses=1, max_age=0, reason=f"By {ctx.author.name}")
     await ctx.send(f"New invite link: {invite.url}")
-    await ctx.send(f"Invite ID:`{invite.id}` was created by{ctx.author.name}")
+    await ctx.send(f"Invite ID:`{invite.id}` was created by {ctx.author.name}")
 
     with open("log_list.txt", "a") as log_file:
         log_file.write(f"Invite ID: {invite.id}. Author: {ctx.author.name}\n")
