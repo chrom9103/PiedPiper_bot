@@ -5,138 +5,46 @@ from dotenv import load_dotenv
 import random
 import re
 
-intents = discord.Intents.all()
-intents.message_content = True
-
 load_dotenv('.env')
 token = os.getenv("TOKEN")
+if not token:
+    raise ValueError("TOKEN is not set in the .env file.")
 
-bot = commands.Bot(
-    command_prefix="?",
-    case_insensitive=True,
-    intents=intents
-)
+intents = discord.Intents.all()
+bot = commands.Bot(command_prefix="?", case_insensitive=True, intents=intents)
+
+# ダイスを振る関数
+def roll_dice(rolls: int, sides: int) -> int:
+    return sum(random.randint(1, sides) for _ in range(rolls))
+
+# ダイス結果をメッセージとして生成
+def create_dice_response(rolls: int, sides: int, limit: int = None, label: str = None):
+    result = roll_dice(rolls, sides)
+    base = f"{rolls}d{sides}"
+
+    if limit is not None:
+        success = "成功" if result <= limit else "失敗"
+        label_part = f"【{label}】 " if label else ""
+        return f"{label_part}({base}<={limit}) > {result} > {success}"
+    else:
+        return f"{base} -> {result}"
 
 @bot.event
 async def on_ready():
     print("Cleared to take off!")
 
 @bot.command()
-async def dice(ctx, m: int, n: int): # mDnを実行
+async def dice(ctx, m: int, n: int):
     if ctx.author.bot:
         return
-
     if m < 1:
         await ctx.reply("1回より多く振ってください")
         return
     if n < 1:
         await ctx.reply("1より大きなダイスにしてください")
         return
-
-    total = 0
-    for i in range(m):
-        total += random.randint(1, n)
+    total = roll_dice(m, n)
     await ctx.reply(total)
-
-@bot.event
-async def on_message(ctx):
-    if ctx.author.bot:
-        return
-    await bot.process_commands(ctx)
-
-    # メッセージが「int+"d"+int」の形式に一致するかチェック
-    pattern = r'^(\d+)d(\d+)$'
-    match = re.match(pattern, ctx.content)
-
-    if match:
-        rolls = int(match.group(1))
-        sides = int(match.group(2))
-
-        if rolls < 1 or sides < 1:
-            await ctx.reply("Specify the number of dice and the number of sides to be 1 or more.")
-            return
-
-        result = roll_dice(rolls,sides)
-
-        await ctx.reply(f"{rolls}d{sides} -> {result}")
-    
-    # メッセージが「int+"d"+int+"<="+int」の形式に一致するかチェック
-    pattern = r'^(\d+)d(\d+)<=(\d+)$'
-    match = re.match(pattern, ctx.content)
-
-    for match in match:
-        rolls = int(match.group(1))
-        sides = int(match.group(2))
-        limit = int(match.group(3))
-
-        if rolls < 1 or sides < 1:
-            await ctx.reply("Specify the number of dice and the number of sides to be 1 or more.")
-            return
-
-        result = roll_dice(rolls,sides)
-
-        if result <= limit:
-            await ctx.reply(f"({rolls}D{sides}<={limit}) > {result} > 成功")
-        else:
-            await ctx.reply(f"({rolls}D{sides}<={limit}) > {result} > 失敗")
-
-    # メッセージが「int+"d"+int+"<="+int」の形式に一致するかチェック
-    pattern = r'^(\d+)d(\d+)<=(\d+) 【(\D)】$'
-    match = re.match(pattern, ctx.content)
-
-    for match in match:
-        rolls = int(match.group(1))
-        sides = int(match.group(2))
-        limit = int(match.group(3))
-        rollName = str(match.group(4))
-
-        if rolls < 1 or sides < 1:
-            await ctx.reply("Specify the number of dice and the number of sides to be 1 or more.")
-            return
-
-        result = roll_dice(rolls,sides)
-
-        if result <= limit:
-            await ctx.reply(f"{rolls}d{sides}<={limit} 【{rollName}】 ({rolls}D{sides}<={limit}) > {result} > 成功")
-        else:
-            await ctx.reply(f"{rolls}d{sides}<={limit} 【{rollName}】 ({rolls}D{sides}<={limit}) > {result} > 失敗")
-
-    # メッセージに「{{int+"d"+int}}」の形式が含まれているかチェック
-    pattern = r'\{\{(\d+)d(\d+)\}\}'
-    match = re.finditer(pattern, ctx.content)
-
-    new_message_parts = []
-    last_end = 0
-
-    for match in match:
-        rolls = int(match.group(1))
-        sides = int(match.group(2))
-
-        if rolls < 1 or sides < 1:
-            await ctx.reply("Specify the number of dice and the number of sides to be 1 or more.")
-            return
-
-        result = roll_dice(rolls,sides)
-
-        # 変更後のメッセージ
-        new_message_parts.append(ctx.content[last_end:match.start()])
-        new_message_parts.append(str(result))
-        last_end = match.end()
-
-    new_message_parts.append(ctx.content[last_end:])
-
-    new_message = ''.join(new_message_parts)
-
-    # 変更がある場合のみ返信
-    if new_message != ctx.content:
-        await ctx.reply(new_message)
-
-def roll_dice(rolls:int,sides:int):
-    result:int
-    result = 0
-    for i in range(rolls):
-        result += random.randint(1, sides)
-    return result
 
 @bot.command()
 async def ping(ctx):
@@ -144,5 +52,64 @@ async def ping(ctx):
         return
     file = os.path.basename(__file__)
     await ctx.reply(f"pong [{file}]")
+
+@bot.event
+async def on_message(message):
+    if message.author.bot:
+        return
+    await bot.process_commands(message)
+
+    content = message.content.strip()
+
+    # 1. "{{XdY}}" を置換
+    inline_pattern = r'\{\{(\d+)[dD](\d+)\}\}'
+    modified = False
+
+    def replace_inline(match):
+        nonlocal modified
+        rolls = int(match.group(1))
+        sides = int(match.group(2))
+        if rolls < 1 or sides < 1:
+            return match.group(0)
+        modified = True
+        return str(roll_dice(rolls, sides))
+
+    new_content = re.sub(inline_pattern, replace_inline, content)
+    if modified:
+        await message.reply(new_content)
+        return
+
+    # 2. "XdY<=Z 【LABEL】"
+    pattern_labeled = r'^(\d+)[dD](\d+)\s*<=\s*(\d+)\s*【\s*(.+?)\s*】$'
+    match = re.match(pattern_labeled, content)
+    if match:
+        rolls, sides, limit, label = map(str.strip, match.groups())
+        rolls = int(rolls)
+        sides = int(sides)
+        limit = int(limit)
+        if rolls >= 1 and sides >= 1:
+            response = create_dice_response(rolls, sides, limit, label)
+            await message.reply(response)
+        return
+
+    # 3. "XdY<=Z"
+    pattern_limit = r'^(\d+)[dD](\d+)\s*<=\s*(\d+)$'
+    match = re.match(pattern_limit, content)
+    if match:
+        rolls, sides, limit = map(int, match.groups())
+        if rolls >= 1 and sides >= 1:
+            response = create_dice_response(rolls, sides, limit)
+            await message.reply(response)
+        return
+
+    # 4. "XdY"
+    pattern_simple = r'^(\d+)[dD](\d+)$'
+    match = re.match(pattern_simple, content)
+    if match:
+        rolls, sides = map(int, match.groups())
+        if rolls >= 1 and sides >= 1:
+            response = create_dice_response(rolls, sides)
+            await message.reply(response)
+        return
 
 bot.run(token)
