@@ -60,15 +60,55 @@ async def on_message(ctx):
 
         await ctx.reply(f"{rolls}d{sides} -> {result}")
     
+    # メッセージが「int+"d"+int+"<="+int」の形式に一致するかチェック
+    pattern = r'^(\d+)d(\d+)<=(\d+)$'
+    match = re.match(pattern, ctx.content)
+
+    for match in match:
+        rolls = int(match.group(1))
+        sides = int(match.group(2))
+        limit = int(match.group(3))
+
+        if rolls < 1 or sides < 1:
+            await ctx.reply("Specify the number of dice and the number of sides to be 1 or more.")
+            return
+
+        result = roll_dice(rolls,sides)
+
+        if result <= limit:
+            await ctx.reply(f"({rolls}D{sides}<={limit}) > {result} > 成功")
+        else:
+            await ctx.reply(f"({rolls}D{sides}<={limit}) > {result} > 失敗")
+
+    # メッセージが「int+"d"+int+"<="+int」の形式に一致するかチェック
+    pattern = r'^(\d+)d(\d+)<=(\d+) 【(\D)】$'
+    match = re.match(pattern, ctx.content)
+
+    for match in match:
+        rolls = int(match.group(1))
+        sides = int(match.group(2))
+        limit = int(match.group(3))
+        rollName = str(match.group(4))
+
+        if rolls < 1 or sides < 1:
+            await ctx.reply("Specify the number of dice and the number of sides to be 1 or more.")
+            return
+
+        result = roll_dice(rolls,sides)
+
+        if result <= limit:
+            await ctx.reply(f"{rolls}d{sides}<={limit} 【{rollName}】 ({rolls}D{sides}<={limit}) > {result} > 成功")
+        else:
+            await ctx.reply(f"{rolls}d{sides}<={limit} 【{rollName}】 ({rolls}D{sides}<={limit}) > {result} > 失敗")
 
     # メッセージに「{{int+"d"+int}}」の形式が含まれているかチェック
     pattern = r'\{\{(\d+)d(\d+)\}\}'
-    matches = re.finditer(pattern, ctx.content)
+    match = re.finditer(pattern, ctx.content)
 
     new_message_parts = []
     last_end = 0
 
-    for match in matches:
+    for match in match:
         rolls = int(match.group(1))
         sides = int(match.group(2))
 
