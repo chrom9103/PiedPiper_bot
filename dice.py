@@ -23,9 +23,20 @@ def create_dice_response(rolls: int, sides: int, limit: int = None, label: str =
     base = f"{rolls}d{sides}"
 
     if limit is not None:
-        success = "成功" if result <= limit else "失敗"
-        label_part = f"【{label}】 " if label else ""
-        return f"{label_part}({base}<={limit}) > {result} > {success}"
+        # 成功等のメッセージを生成
+        msg = ""
+        if result <= limit:
+            msg = "成功"
+        else:
+            msg = "失敗"
+        
+        # 【LABEL】がある場合はそれを追加
+        if label:
+            label_part = f"【{label}】 "
+        else:
+            label_part = ""
+
+        return f"{label_part}({base}<={limit}) > {result} > {msg}"
     else:
         return f"{base} -> {result}"
 
