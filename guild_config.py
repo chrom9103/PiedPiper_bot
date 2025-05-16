@@ -60,6 +60,7 @@ async def add(ctx, role:str, *member:discord.Member):
         1305402751689162835,  # 機械学習
         1371799262534303844   # discord-bot
     ]
+    target_role = discord.utils.get(ctx.guild.roles, name=role)
 
     if ctx.channel.id != 1342861713300521051:
         await ctx.reply("You cannot use this command in this channel.")
@@ -72,23 +73,21 @@ async def add(ctx, role:str, *member:discord.Member):
                 await ctx.reply("Permission error")
                 return
             
-            member_role = discord.utils.get(ctx.guild.roles, name="member")
             premember_role = discord.utils.get(ctx.guild.roles, name="pre-member")
             for user in member:
-                await user.add_roles(member_role)
+                await user.add_roles(target_role)
                 await user.remove_roles(premember_role)
-                print(f"Added {user.name} to {member_role.name}.")
+                print(f"Added {user.name} to {target_role.name}.")
 
-        elif role in seminar_list:
+        elif target_role in seminar_list:
 
             if admin_role not in ctx.author.roles and mentor_role not in ctx.author.roles:
                 await ctx.reply("Permission error")
                 return
             
-            mentor_role = discord.utils.get(ctx.guild.roles, name=role)
             for user in member:
-                await user.add_roles(mentor_role)
-                print(f"Added {user.name} to {role.name}.")
+                await user.add_roles(target_role)
+                print(f"Added {user.name} to {target_role.name}.")
 
     except discord.Forbidden:
         await print("Permission error")
