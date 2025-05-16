@@ -40,7 +40,7 @@ async def mkivt(ctx):
     await ctx.send(f"New invite link: {invite.url}")
     await ctx.send(f"Invite ID:`{invite.id}` was created by {ctx.author.name}")
 
-    with open("log_list.txt", "a") as log_file:
+    with open("logs\log_list.txt", "a") as log_file:
         log_file.write(f"Invite ID: {invite.id}. Author: {ctx.author.name}\n")
 
 @bot.command()

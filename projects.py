@@ -17,7 +17,7 @@ bot = commands.Bot(
     intents=intents
 )
 
-LOG_FILE = "chat_log.txt"
+LOG_FILE = "logs/chat_log.txt"
 
 @bot.event
 async def on_ready():
