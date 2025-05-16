@@ -49,7 +49,7 @@ async def add(ctx, role:str, *member:discord.Member):
         return
 
     admin_role_id = 1304058655502503977 # admin role ID
-    mentor_role_id = 1304058655502503977 # mentor role ID
+    mentor_role_id = 1304077274278133810 # mentor role ID
     admin_role = discord.utils.get(ctx.guild.roles, id=admin_role_id)
     mentor_role = discord.utils.get(ctx.guild.roles, id=mentor_role_id)
 
@@ -79,7 +79,7 @@ async def add(ctx, role:str, *member:discord.Member):
                 await user.remove_roles(premember_role)
                 print(f"Added {user.name} to {target_role.name}.")
 
-        elif target_role in seminar_list:
+        elif target_role and target_role.id in seminar_list:
 
             if admin_role not in ctx.author.roles and mentor_role not in ctx.author.roles:
                 await ctx.reply("Permission error")
@@ -90,9 +90,9 @@ async def add(ctx, role:str, *member:discord.Member):
                 print(f"Added {user.name} to {target_role.name}.")
 
     except discord.Forbidden:
-        await print("Permission error")
+        print("Permission error")
     except discord.HTTPException as e:
-        await print(f"An error occurred: {e}")
+        print(f"An error occurred: {e}")
 
 @bot.command()
 async def ping(ctx):
