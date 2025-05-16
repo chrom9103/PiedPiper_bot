@@ -44,31 +44,52 @@ async def mkivt(ctx):
         log_file.write(f"Invite ID: {invite.id}. Author: {ctx.author.name}\n")
 
 @bot.command()
-async def add(ctx, mode:str, *member:discord.Member):
+async def add(ctx, role:str, *member:discord.Member):
     if ctx.author.bot:
         return
 
-    role_id = 1304058655502503977
-    role = discord.utils.get(ctx.guild.roles, id=role_id)
+    admin_role_id = 1304058655502503977 # admin role ID
+    mentor_role_id = 1304058655502503977 # mentor role ID
+    admin_role = discord.utils.get(ctx.guild.roles, id=admin_role_id)
+    mentor_role = discord.utils.get(ctx.guild.roles, id=mentor_role_id)
 
-    if role not in ctx.author.roles:
-        await ctx.reply("Permission error")
-        return
+    seminar_list = [
+        1371796031318130799,  # Unity
+        1371795945859186831,  # web創作
+        1305402941125038154,  # 課題解決
+        1305402751689162835,  # 機械学習
+        1371799262534303844   # discord-bot
+    ]
 
     if ctx.channel.id != 1342861713300521051:
         await ctx.reply("You cannot use this command in this channel.")
         return
     
     try:
-        if mode == "member":
+        if role == "member":
+
+            if admin_role not in ctx.author.roles:
+                await ctx.reply("Permission error")
+                return
+            
             member_role = discord.utils.get(ctx.guild.roles, name="member")
             premember_role = discord.utils.get(ctx.guild.roles, name="pre-member")
             for user in member:
                 await user.add_roles(member_role)
                 await user.remove_roles(premember_role)
                 print(f"Added {user.name} to {member_role.name}.")
-                with open("addList.txt", "a") as file:
-                    file.write(f"{member}\n")
+
+        elif role in seminar_list:
+
+            if admin_role not in ctx.author.roles and mentor_role not in ctx.author.roles:
+                await ctx.reply("Permission error")
+                return
+            
+            mentor_role = discord.utils.get(ctx.guild.roles, name=role)
+            for user in member:
+                await user.add_roles(mentor_role)
+                print(f"Added {user.name} to {role.name}.")
+
     except discord.Forbidden:
         await print("Permission error")
     except discord.HTTPException as e:
