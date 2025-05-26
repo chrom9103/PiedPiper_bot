@@ -39,7 +39,7 @@ async def on_ready():
                 continue  # @everyoneは除外
             lines.append(f"{role.name} = {role.id}")
 
-        file_path = f"./datas/{guild_name}_roleID"
+        file_path = f"./datas/{guild_name}_roleID.env"
         with open(file_path, "w", encoding="utf-8") as f:
             f.write("\n".join(lines))
 
