@@ -36,9 +36,14 @@ async def pin(ctx, url: str):
     channel_id = int(match.group(1))
     message_id = int(match.group(2))
 
-    channel = ctx.guild.get_channel(channel_id)
-    if not isinstance(channel, discord.TextChannel):
+    try:
+        channel = await bot.fetch_channel(channel_id)
+    except discord.NotFound:
         await ctx.reply("チャンネルが見つかりません。")
+        return
+
+    if not isinstance(channel, (discord.TextChannel, discord.Thread)):
+        await ctx.reply("指定されたチャンネルはテキストチャンネルまたはスレッドではありません。")
         return
 
     try:
@@ -79,9 +84,10 @@ async def pin(interaction: discord.Interaction, message: str):
         )
         return
 
-    if not isinstance(channel, discord.TextChannel):
+    # スレッドまたはテキストチャンネルを許容
+    if not isinstance(channel, (discord.TextChannel, discord.Thread)):
         await interaction.response.send_message(
-            "指定されたチャンネルはテキストチャンネルではありません。",
+            "指定されたチャンネルはテキストチャンネルまたはスレッドではありません。",
             ephemeral=True
         )
         return
