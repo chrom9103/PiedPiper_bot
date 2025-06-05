@@ -22,6 +22,35 @@ bot = commands.Bot(command_prefix="?", intents=intents)
 async def on_ready():
     print(f"Logged in as {bot.user.name}")
 
+@bot.command()
+async def pin(ctx, url: str):
+    if ctx.author.bot:
+        return
+    # メッセージURLからチャンネルIDとメッセージIDを抽出
+    url_pattern = r"https://discord\.com/channels/\d+/(\d+)/(\d+)"
+    match = re.match(url_pattern, url)
+    if not match:
+        await ctx.reply("有効なDiscordメッセージURLを入力してください。")
+        return
+
+    channel_id = int(match.group(1))
+    message_id = int(match.group(2))
+
+    channel = ctx.guild.get_channel(channel_id)
+    if not isinstance(channel, discord.TextChannel):
+        await ctx.reply("チャンネルが見つかりません。")
+        return
+
+    try:
+        msg = await channel.fetch_message(message_id)
+        await msg.pin()
+    except discord.Forbidden:
+        await ctx.reply("ピン止めする権限がありません。")
+    except discord.NotFound:
+        await ctx.reply("メッセージが見つかりません。")
+    except discord.HTTPException as e:
+        await ctx.reply(f"ピン止めに失敗しました: {e}")
+
 @bot.tree.command(name="pin", description="Pin a message in the channel")
 @app_commands.describe(message="The message to pin")
 async def pin(interaction: discord.Interaction, message: str):
