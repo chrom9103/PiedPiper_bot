@@ -63,13 +63,13 @@ async def pin(ctx, url: str):
 
 @bot.tree.command(name="pin", description="Pin a message in the channel")
 @app_commands.describe(message="The message to pin")
-async def pin(interaction: discord.Interaction, message: str):
+async def pin(interaction: discord.Interaction, message_url: str):
     if interaction.user.bot:
         return
 
     # メッセージURLからチャンネルIDとメッセージIDを抽出
     url_pattern = r"https://discord\.com/channels/\d+/(\d+)/(\d+)"
-    match = re.match(url_pattern, message)
+    match = re.match(url_pattern, message_url)
     if not match:
         await interaction.response.send_message(
             "有効なDiscordメッセージURLを入力してください。",
