@@ -118,6 +118,18 @@ async def on_message(message):
             response = create_dice_response(rolls, sides, limit)
             await message.reply(response)
         return
+    
+    # 4. "XdY 【LABEL】"
+    pattern_labeled_simple = r'^(\d+)[dD](\d+)\s*【\s*(.+?)\s*】$'
+    match = re.match(pattern_labeled_simple, content)
+    if match:
+        rolls, sides, label = map(str.strip, match.groups())
+        rolls = int(rolls)
+        sides = int(sides)
+        if rolls >= 1 and sides >= 1:
+            response = create_dice_response(rolls, sides, label=label)
+            await message.reply(response)
+        return
 
     # 4. "XdY"
     pattern_simple = r'^(\d+)[dD](\d+)$'
