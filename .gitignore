@@ -1,2 +1,4 @@
 .env
 /datas
+/bot-env
+nohup.out
