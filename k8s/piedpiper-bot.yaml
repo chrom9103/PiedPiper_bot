@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: piedpiper-bot
+spec:
+  selector:
+    matchLabels:
+      app: piedpiper-bot
+  template:
+    metadata:
+      labels:
+        app: piedpiper-bot
+    spec:
+      containers:
+      - name: piedpiper-bot
+        image: <Image>

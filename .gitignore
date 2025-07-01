@@ -1,4 +1,5 @@
 .env
+*.gz
 /datas
 /bot-env
 nohup.out

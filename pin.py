@@ -62,7 +62,7 @@ async def pin(ctx, url: str):
         await ctx.reply(f"ピン止めに失敗しました: {e}")
 
 @bot.tree.command(name="pin", description="Pin a message in the channel")
-@app_commands.describe(message="The message to pin")
+@app_commands.describe(message_url="The message to pin")
 async def pin(interaction: discord.Interaction, message_url: str):
     if interaction.user.bot:
         return
