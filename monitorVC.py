@@ -26,13 +26,13 @@ async def on_voice_state_update(member, before, after):
     # when joined a voice channel
     if before.channel is None and after.channel is not None:
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            with open(f"datas/vc_log_{datetime.now().strftime("%Y-%m")}.txt", "a") as file:
+            with open(f"datas/vc_log_{datetime.now().strftime('%Y-%m')}.txt", "a") as file:
                 file.write(f"{member},{current_time},0\n")
 
     # when left a voice channel
     if before.channel is not None and after.channel is None:
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            with open(f"datas/vc_log_{datetime.now().strftime("%Y-%m")}.txt", "a") as file:
+            with open(f"datas/vc_log_{datetime.now().strftime('%Y-%m')}.txt", "a") as file:
                 file.write(f"{member},{current_time},1\n")
 
 @bot.command()
