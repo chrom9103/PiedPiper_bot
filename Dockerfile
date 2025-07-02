@@ -10,3 +10,5 @@ COPY . .
 RUN chmod +x start.sh
 
 CMD ["./start.sh"]
+
+RUN apt-get install -y tzdata && \ ln -sf /usr/share/zoneinfo/Asia/Tokyo/etc/localtime
