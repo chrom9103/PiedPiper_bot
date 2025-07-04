@@ -1,5 +1,6 @@
 .env
 *.gz
+*.tar
 /datas
 /bot-env
 nohup.out
