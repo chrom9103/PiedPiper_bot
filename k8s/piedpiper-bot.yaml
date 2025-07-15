@@ -15,3 +15,10 @@ spec:
       - name: piedpiper-bot
         image: piedpiper-bot:v0.0.2
         imagePullPolicy: Never
+        volumeMounts:
+        - name: vc-log-storage
+          mountPath: /app/datas
+      volumes:
+      - name: vc-log-storage
+        persistentVolumeClaim:
+          claimName: vc-log-pvc
