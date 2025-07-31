@@ -4,7 +4,7 @@ from discord.ext import commands
 import os
 from dotenv import load_dotenv
 import re
-import datetime
+from datetime import datetime
 
 load_dotenv('.env')
 token = os.getenv("TOKEN")
@@ -28,30 +28,34 @@ async def on_ready():
     except Exception as e:
         print(f"Failed to sync commands: {e}")
 
-@bot.tree.command(name="pin", description="Pin a message in the channel")
-@app_commands.describe(message_url="The message to pin")
-async def record(interaction: discord.Interaction, mode: str):
-    if interaction.user.bot:
-        return
+# @bot.tree.command(name="pin", description="Pin a message in the channel")
+# @app_commands.describe(message_url="The message to pin")
+# async def record(interaction: discord.Interaction, mode: str):
+#     if interaction.user.bot:
+#         return
 
 @bot.event
 async def on_voice_state_update(member, before, after):
     # when joined a voice channel
     if before.channel is None and after.channel is not None:
-            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             os.makedirs("datas", exist_ok=True)
             with open(f"datas/on_vc.txt", "a") as file:
                 file.write(f"{member}\n")
 
     # when left a voice channel
     if before.channel is not None and after.channel is None:
-            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             os.makedirs("datas", exist_ok=True)
             file = open(f"datas/on_vc.txt", "a")
-            datalist = file.readlines()
-            for data in datalist:
-                if data != member:
-                    file.write(f"{member}\n")
+            with open("datas/on_vc.txt", "r") as file:
+                lines = file.readlines()
+
+            updated_lines = []
+            for line in lines:
+                if member.display_name not in line:
+                    updated_lines.append(line)
+
+            # with open("datas/on_vc.txt", "w") as file:
+            #     file.writelines(updated_lines)
 
 @bot.command()
 async def ping(ctx):
