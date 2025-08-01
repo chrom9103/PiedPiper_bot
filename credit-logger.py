@@ -54,9 +54,6 @@ async def on_voice_state_update(member, before, after):
                 if member.display_name not in line:
                     updated_lines.append(line)
 
-            # with open("datas/on_vc.txt", "w") as file:
-            #     file.writelines(updated_lines)
-
 @bot.command()
 async def ping(ctx):
     if ctx.author.bot:
