@@ -1,15 +1,40 @@
 from datetime import datetime, timedelta, timezone
 from collections import defaultdict
 import glob
+import re
+
+# 計算対象講義を設定
+lect = "08/01_20:00-21:00 【アマチュア無線学I】by ベル"
+pattern = "^(\d{2}/\d{2})_(\d{2}:\d{2})-(\d{2}:\d{2})\s【(.*?)】by\s(.*?)$"
+
+match = re.search(pattern, lect)
+print(match)
+
+if match:
+    print(match.group())
+    print(match.group(1))
+    date_str = match.group(1)
+    start_time_str = match.group(2)
+    end_time_str = match.group(3)
+    title = match.group(4)
+
+    # 年の情報を補完
+    year = "2025"
+    
+    start_time_jst_str = f"{year}/{date_str}-{start_time_str}:00"
+    end_time_jst_str = f"{year}/{date_str}-{end_time_str}:00"
+
+    print(f"start_time_jst_str: {start_time_jst_str}")
+    print(f"end_time_jst_str: {end_time_jst_str}")
+else:
+    print("パターンに一致する文字列が見つかりませんでした。")
 
 # 計算対象の期間を日本標準時 (JST) で設定
 JST = timezone(timedelta(hours=+9), 'JST')
-start_time_jst_str = "2025-08-03 20:00:00"
-end_time_jst_str = "2025-08-03 21:00:00"
 
 # JSTからUTCへ変換
-start_time_jst = datetime.strptime(start_time_jst_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=JST)
-end_time_jst = datetime.strptime(end_time_jst_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=JST)
+start_time_jst = datetime.strptime(start_time_jst_str, "%Y/%m/%d-%H:%M:%S").replace(tzinfo=JST)
+end_time_jst = datetime.strptime(end_time_jst_str, "%Y/%m/%d-%H:%M:%S").replace(tzinfo=JST)
 
 start_time_utc = start_time_jst.astimezone(timezone.utc)
 end_time_utc = end_time_jst.astimezone(timezone.utc)
@@ -91,7 +116,7 @@ result_array = sorted(
 # 最終結果を出力
 print("---")
 print("集計結果")
-print(f"講座名: 自作PC概論")
+print(f"講座名: {title}")
 print(f"対象期間 (JST): {start_time_jst_str} - {end_time_jst_str}")
 print(f"対象期間 (UTC): {start_time_utc.strftime('%Y-%m-%d %H:%M:%S')} - {end_time_utc.strftime('%Y-%m-%d %H:%M:%S')}")
 print("---")
