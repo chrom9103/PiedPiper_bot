@@ -4,7 +4,7 @@ import glob
 import re
 
 # 計算対象講義を設定
-lect = "08/07_09:00-09:30 【情報テクノロジー体験演習 かしこいロボット（１）】by 奏 (第1回)"
+lect = "08/17_20:00-22:00 【ストリングスの重ね方と打ち込み方】by ばんえつ"
 pattern = "^(\d{2}/\d{2})_(\d{2}:\d{2})-(\d{2}:\d{2})\s【(.*?)】by\s(.*?)$"
 
 match = re.search(pattern, lect)
@@ -118,7 +118,7 @@ print("---")
 print("集計結果")
 print(f"講座名: {title}")
 print(f"対象期間 (JST): {start_time_jst_str} - {end_time_jst_str}")
-print(f"対象期間 (UTC): {start_time_utc.strftime('%Y-%m-%d %H:%M:%S')} - {end_time_utc.strftime('%Y-%m-%d %H:%M:%S')}")
+print(f"対象期間 (UTC): {start_time_utc.strftime('%Y/%m/%d-%H:%M:%S')} - {end_time_utc.strftime('%Y/%m/%d-%H:%M:%S')}")
 print("---")
 if not result_array:
     print("指定された期間内にVCへの接続はありませんでした。")
