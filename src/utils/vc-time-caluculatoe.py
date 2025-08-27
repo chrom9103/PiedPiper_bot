@@ -4,7 +4,7 @@ import glob
 import re
 
 # 計算対象講義を設定
-lect = "08/17_20:00-22:00 【ストリングスの重ね方と打ち込み方】by ばんえつ"
+lect = "08/27_20:00-21:30 【鳥類識別概論】by ぶんてふ"
 pattern = "^(\d{2}/\d{2})_(\d{2}:\d{2})-(\d{2}:\d{2})\s【(.*?)】by\s(.*?)$"
 
 match = re.search(pattern, lect)
