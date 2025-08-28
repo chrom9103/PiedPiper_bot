@@ -2,5 +2,6 @@
 *.gz
 *.tar
 /datas
+/logs
 /bot-env
 nohup.out
