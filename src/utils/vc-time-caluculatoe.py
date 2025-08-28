@@ -4,7 +4,7 @@ import glob
 import re
 
 # 計算対象講義を設定
-lect = "08/27_20:00-21:30 【鳥類識別概論】by ぶんてふ"
+lect = "08/28_20:00-21:00 【VScode拡張機能作成講座】by 奏"
 pattern = "^(\d{2}/\d{2})_(\d{2}:\d{2})-(\d{2}:\d{2})\s【(.*?)】by\s(.*?)$"
 
 match = re.search(pattern, lect)
@@ -40,7 +40,7 @@ start_time_utc = start_time_jst.astimezone(timezone.utc)
 end_time_utc = end_time_jst.astimezone(timezone.utc)
 
 # ログファイルのパターン
-file_pattern = './datas/vc_log_*.txt'
+file_pattern = './logs/vc_log_*.txt'
 user_events = defaultdict(list)
 
 # ファイルからログを読み込み
