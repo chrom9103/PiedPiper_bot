@@ -4,4 +4,5 @@
 /datas
 /logs
 /bot-env
+__pycache__
 nohup.out

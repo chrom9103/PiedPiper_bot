@@ -1,39 +1,13 @@
-import os
 import discord
 from discord.ext import commands
-from dotenv import load_dotenv
+import os
 import re
 
-intents = discord.Intents.all()
-intents.message_content = True
-
-load_dotenv('.env')
-token = os.getenv("TOKEN")
-
-bot = commands.Bot(
-    command_prefix="?",
-    case_insensitive=True,
-    intents=intents
-)
-
-@bot.event
-async def on_ready():
-    print(f"Logged in as {bot.user.name}")
-
-@bot.event
-async def on_message(message):
-    if message.author.bot:
-        return
-    await bot.process_commands(message)
-
-    pattern = r'^((にゃ|にゃー)\s*)+$'
-    match = re.match(pattern, message.content)
-
-    if match:
-        morse_code = message.content.replace('にゃー', '-').replace('にゃ', '.')
-        print(morse_code)
-
-        morse_dict = {
+class MorseCog(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+        # モールス信号の辞書をクラスの属性として定義
+        self.morse_dict = {
             # アルファベット
             '.-': 'A', '-...': 'B', '-.-.': 'C', '-..': 'D', '.': 'E',
             '..-.': 'F', '--.': 'G', '....': 'H', '..': 'I', '.---': 'J',
@@ -51,18 +25,31 @@ async def on_message(message):
             '.--.-.': '@', '---...': ':', '-.-.-.': ';', '...-..-': '$',
             '.-...': '&',
         }
+        # 正規表現パターンもクラスの属性として定義
+        self.pattern = re.compile(r'^((にゃ|にゃー)\s*)+$')
 
-        morse_letters = morse_code.split()
-        result = ''
-        for letter in morse_letters:
-            result += morse_dict.get(letter, '?')
-        await message.reply(f"{result}")
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        """メッセージを監視し、モールス信号をデコードします。"""
+        if message.author.bot:
+            return
+        
+        # 正規表現を使ってメッセージ内容をチェック
+        if self.pattern.match(message.content):
+            # メッセージをモールス符号に変換
+            morse_code = message.content.replace('にゃー', '-').replace('にゃ', '.').strip()
+            
+            morse_letters = morse_code.split()
+            result = ''
+            for letter in morse_letters:
+                # 辞書を使ってデコードし、見つからない場合は'?'を返す
+                result += self.morse_dict.get(letter, '?')
+            
+            await message.reply(f"{result}")
+            
+        # コマンドの処理を忘れずに呼び出す
+        await self.bot.process_commands(message)
 
-@bot.command()
-async def ping(ctx):
-    if ctx.author.bot:
-        return
-    file = os.path.basename(__file__)
-    await ctx.reply(f"pong [{file}]")
 
-bot.run(token)
+async def setup(bot):
+    await bot.add_cog(MorseCog(bot))
