@@ -6,12 +6,13 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+ENV PYTHONPATH=/app
 
-COPY requirements.txt .
+COPY scripts/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN chmod +x start.sh
+RUN chmod +x ./scripts/start.sh
 
-CMD ["./scripts/start.sh"]
+CMD ["scripts/start.sh"]
