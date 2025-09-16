@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: piedpiper-bot
-        image: piedpiper-bot:v0.0.2
+        image: piedpiper-bot:v0.1.2
         imagePullPolicy: Never
         volumeMounts:
         - name: vc-log-storage
