@@ -17,7 +17,7 @@ spec:
         imagePullPolicy: Never
         volumeMounts:
         - name: vc-log-storage
-          mountPath: /app/datas
+          mountPath: /app/logs
       volumes:
       - name: vc-log-storage
         persistentVolumeClaim:
