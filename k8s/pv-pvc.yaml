@@ -24,3 +24,30 @@ spec:
     requests:
       storage: 1Gi
   volumeName: vc-log-pv
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: datas-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: microk8s-hostpath
+  hostPath:
+    path: "/var/snap/microk8s/common/datas"
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: datas-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: datas-pv

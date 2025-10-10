@@ -15,10 +15,22 @@ spec:
       - name: piedpiper-bot
         image: piedpiper-bot:v0.1.2
         imagePullPolicy: Never
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
         volumeMounts:
         - name: vc-log-storage
+          mountPath: /app/logs
+        - name: datas-storage
           mountPath: /app/datas
       volumes:
       - name: vc-log-storage
         persistentVolumeClaim:
           claimName: vc-log-pvc
+      - name: datas-storage
+        persistentVolumeClaim:
+          claimName: datas-pvc
