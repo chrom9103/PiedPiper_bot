@@ -4,7 +4,7 @@ import glob
 import os
 
 # ファイルパスのパターン
-file_pattern = './datas/vc_log_*.txt'
+file_pattern = './logs/vc_log_*.txt'
 user_events = defaultdict(list)
 
 # 複数ファイルを取得
