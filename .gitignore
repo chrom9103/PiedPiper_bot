@@ -6,3 +6,4 @@
 /bot-env
 __pycache__
 nohup.out
+k8s/postgres-secret.yaml
