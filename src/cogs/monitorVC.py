@@ -1,33 +1,42 @@
 import discord
 from discord.ext import commands
-import os
-from datetime import datetime
+from datetime import datetime, timezone
+from utils.database import db
+
 
 class VoiceLoggerCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.log_dir = "logs"
-        
-        if not os.path.exists(self.log_dir):
-            os.makedirs(self.log_dir)
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        """ボイスチャンネルの入退室をログに記録します。"""
-        # ログファイルパスを動的に生成
-        log_file_path = os.path.join(self.log_dir, f"vc_log_{datetime.now().strftime('%Y-%m')}.txt")
+        """ボイスチャンネルの入退室をDBに記録する"""
+        now = datetime.now(timezone.utc)
 
         # 参加時
         if before.channel is None and after.channel is not None:
-            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            with open(log_file_path, "a") as file:
-                file.write(f"{member},{current_time},0\n")
+            # ユーザー情報を更新
+            await db.upsert_user(
+                user_id=member.id,
+                username=member.name,
+                display_name=member.display_name,
+            )
+            # セッション開始
+            await db.open_session(
+                user_id=member.id,
+                guild_id=after.channel.guild.id,
+                channel_id=after.channel.id,
+                join_time=now,
+            )
 
         # 退出時
-        if before.channel is not None and after.channel is None:
-            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            with open(log_file_path, "a") as file:
-                file.write(f"{member},{current_time},1\n")
+        elif before.channel is not None and after.channel is None:
+            await db.close_session(
+                user_id=member.id,
+                guild_id=before.channel.guild.id,
+                left_time=now,
+            )
+
 
 async def setup(bot):
     await bot.add_cog(VoiceLoggerCog(bot))
