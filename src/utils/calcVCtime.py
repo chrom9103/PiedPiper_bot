@@ -1,50 +1,65 @@
-from datetime import datetime
-from collections import defaultdict
-import glob
+"""
+PostgreSQL上のvc_sessionsテーブルから、
+指定期間のVC接続時間を集計してコンソールに出力するスクリプト
+
+使用方法:
+  1. 下記の START_DATE / END_DATE を変更
+  2. DATABASE_URL 環境変数を設定して実行
+     例: DATABASE_URL="postgresql://digitart-bot:password@localhost:5432/digitart-bot" python src/utils/calcVCtime.py
+"""
+
+import asyncio
 import os
+import asyncpg
+from datetime import datetime, timezone
 
-# ファイルパスのパターン
-file_pattern = './logs/vc_log_*.txt'
-user_events = defaultdict(list)
+# ========== 集計期間の設定 ==========
+# 開始日時 (UTC)
+START_DATE = datetime(2026, 2, 1, tzinfo=timezone.utc)
+# 終了日時 (UTC) — この日時は含まない
+END_DATE = datetime(2026, 3, 1, tzinfo=timezone.utc)
+# ====================================
 
-# 複数ファイルを取得
-for file_path in glob.glob(file_pattern):
-    print(f"Processing file: {file_path}")
-    with open(file_path, 'r') as f:
-        for line in f:
-            line = line.strip().strip('[]')
-            if not line:
-                continue
-            name, time_str, flag = line.split(',')
-            timestamp = datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S")
-            user_events[name].append((timestamp, int(flag)))
 
-# 接続時間を集計
-user_total_times = {}
+async def main():
+    database_url = os.getenv("DATABASE_URL")
+    if not database_url:
+        print("ERROR: DATABASE_URL 環境変数が設定されていません")
+        print('例: DATABASE_URL="postgresql://digitart-bot:password@localhost:5432/digitart-bot" python src/utils/calcVCtime.py')
+        return
 
-for name, events in user_events.items():
-    events.sort()  # 時間順に並べ替え
-    total_time = 0
-    join_time = None
+    conn = await asyncpg.connect(database_url)
 
-    for timestamp, flag in events:
-        if flag == 0:  # join
-            join_time = timestamp
-        elif flag == 1 and join_time:
-            delta = timestamp - join_time
-            total_time += delta.total_seconds()
-            join_time = None
+    try:
+        print(f"集計期間: {START_DATE.strftime('%Y-%m-%d %H:%M:%S')} ~ {END_DATE.strftime('%Y-%m-%d %H:%M:%S')} (UTC)")
+        print("=" * 50)
 
-    user_total_times[name] = total_time
+        rows = await conn.fetch("""
+            SELECT u.username, u.display_name,
+                   SUM(s.duration_sec) AS total_seconds
+            FROM vc_sessions s
+            JOIN users u ON s.user_id = u.user_id
+            WHERE s.join_time >= $1
+              AND s.join_time < $2
+              AND s.left_time IS NOT NULL
+            GROUP BY u.user_id, u.username, u.display_name
+            ORDER BY total_seconds DESC
+        """, START_DATE, END_DATE)
 
-# ソート用配列に変換して降順にソート
-result_array = sorted(
-    [(name, int(seconds)) for name, seconds in user_total_times.items()],
-    key=lambda x: x[1],
-    reverse=True
-)
+        if not rows:
+            print("該当期間のデータがありません。")
+            return
 
-# 出力（任意）
-for name, seconds in result_array:
-    minutes = seconds // 60
-    print(f"{name}: {seconds}秒 ({minutes}分)")
+        for row in rows:
+            seconds = row["total_seconds"]
+            hours = seconds // 3600
+            minutes = (seconds % 3600) // 60
+            name = row["display_name"] or row["username"]
+            print(f"{name}: {seconds}秒 ({hours}時間{minutes}分)")
+
+    finally:
+        await conn.close()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
