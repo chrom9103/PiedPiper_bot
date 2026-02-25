@@ -2,7 +2,7 @@ FROM python:3.12.11-slim-bullseye
 
 ENV TZ=Asia/Tokyo
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends tzdata && \
+    apt-get install -y --no-install-recommends tzdata gcc libpq-dev && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
