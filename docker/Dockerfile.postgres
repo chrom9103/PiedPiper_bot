@@ -1,0 +1,13 @@
+FROM postgres:16-bookworm
+
+ENV TZ=Asia/Tokyo
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends locales && \
+    rm -rf /var/lib/apt/lists/* && \
+    sed -i '/ja_JP.UTF-8/s/^# //' /etc/locale.gen && \
+    locale-gen
+
+ENV LANG=ja_JP.UTF-8
+
+COPY docker/init.sql /docker-entrypoint-initdb.d/
