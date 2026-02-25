@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 import asyncio
+from utils.database import db
 
 load_dotenv(".env")
 token = os.getenv("TOKEN")
@@ -21,6 +22,8 @@ bot = commands.Bot(
 
 @bot.event
 async def on_ready():
+    # Bot起動時に閉じられていないセッションを処理
+    await db.close_stale_sessions()
     print(f'logined as {bot.user.name}')
 
 # Cogs（機能別ファイル）を読み込む処理
@@ -38,8 +41,12 @@ async def load_cogs():
 
 # Botの実行
 async def main():
-    await load_cogs()
-    await bot.start(token)
+    await db.connect()
+    try:
+        await load_cogs()
+        await bot.start(token)
+    finally:
+        await db.close()
 
 if __name__ == '__main__':
     import asyncio
