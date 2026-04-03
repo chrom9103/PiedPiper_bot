@@ -13,39 +13,6 @@ class ManagementCog(commands.Cog):
             os.makedirs(self.log_dir)
 
     @commands.command()
-    async def mkivt(self, ctx):
-        if ctx.author.bot:
-            return
-
-        # ロールIDとチャンネルIDを定数として定義
-        required_role_id = 1304058655502503977
-        required_channel_id = 1342861713300521051
-        
-        required_role = discord.utils.get(ctx.guild.roles, id=required_role_id)
-        
-        # 権限とチャンネルのチェック
-        if required_role not in ctx.author.roles:
-            await ctx.send(f"Permission issue\n{required_role.mention} {ctx.author.name} is creating an invite link.")
-            return
-
-        if ctx.channel.id != required_channel_id:
-            await ctx.reply("このチャンネルではコマンドを使用できません。")
-            return
-
-        try:
-            invite = await ctx.channel.create_invite(max_uses=1, max_age=0, reason=f"By {ctx.author.name}")
-            await ctx.send(f"New invite link: {invite.url}")
-            await ctx.send(f"Invite ID:`{invite.id}` was created by {ctx.author.name}")
-            
-            with open(self.log_file_path, "a") as log_file:
-                log_file.write(f"Invite ID: {invite.id}. Author: {ctx.author.name}\n")
-        
-        except discord.Forbidden:
-            await ctx.reply("招待を作成する権限がありません。")
-        except discord.HTTPException as e:
-            await ctx.reply(f"エラーが発生しました: {e}")
-
-    @commands.command()
     async def add(self, ctx, role: str, *members: discord.Member):
         if ctx.author.bot:
             return
