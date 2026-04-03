@@ -46,7 +46,7 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: digitart-bot-postgres:v0.1.0
+        image: digitart-bot-postgres:v0.1.2
         imagePullPolicy: Never
         ports:
         - containerPort: 5432

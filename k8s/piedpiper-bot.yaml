@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: piedpiper-bot
-        image: piedpiper-bot:v0.1.0
+        image: piedpiper-bot:v0.1.2
         imagePullPolicy: Never
         env:
         - name: DATABASE_URL
