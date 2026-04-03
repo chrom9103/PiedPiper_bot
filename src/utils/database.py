@@ -194,6 +194,20 @@ class Database:
             """, guild_id, start_time, end_time, limit)
             return rows
 
+    async def get_latest_sessions(self, limit: int = 100) -> list[asyncpg.Record]:
+        """最新のVCセッション記録を取得する（デフォルト100件）"""
+        async with self.pool.acquire() as conn:
+            rows = await conn.fetch("""
+                SELECT u.user_id, u.username, u.display_name,
+                       s.id, s.guild_id, s.channel_id,
+                       s.join_time, s.left_time, s.duration_sec
+                FROM vc_sessions s
+                JOIN users u ON s.user_id = u.user_id
+                ORDER BY s.join_time DESC
+                LIMIT $1
+            """, limit)
+            return rows
+
 
 # グローバルシングルトン
 db = Database()

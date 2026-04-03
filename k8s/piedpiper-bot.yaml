@@ -18,6 +18,16 @@ spec:
         image: piedpiper-bot:v0.1.2
         imagePullPolicy: Never
         env:
+        - name: TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: token
+        - name: CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: client-secret
         - name: DATABASE_URL
           valueFrom:
             secretKeyRef:

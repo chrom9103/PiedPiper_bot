@@ -15,9 +15,9 @@ from datetime import datetime, timezone
 
 # ========== 集計期間の設定 ==========
 # 開始日時 (UTC)
-START_DATE = datetime(2026, 2, 1, tzinfo=timezone.utc)
+START_DATE = datetime(2026, 4, 2, tzinfo=timezone.utc)
 # 終了日時 (UTC) — この日時は含まない
-END_DATE = datetime(2026, 3, 1, tzinfo=timezone.utc)
+END_DATE = datetime(2026, 4, 10, tzinfo=timezone.utc)
 # ====================================
 
 
