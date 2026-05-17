@@ -15,9 +15,9 @@ from datetime import datetime, timezone
 
 # ========== 集計期間の設定 ==========
 # 開始日時 (UTC)
-START_DATE = datetime(2026, 4, 2, tzinfo=timezone.utc)
+START_DATE = datetime(2025, 4, 1, tzinfo=timezone.utc)
 # 終了日時 (UTC) — この日時は含まない
-END_DATE = datetime(2026, 4, 10, tzinfo=timezone.utc)
+END_DATE = datetime(2026, 5, 1, tzinfo=timezone.utc)
 # ====================================
 
 
@@ -49,6 +49,12 @@ async def main():
         if not rows:
             print("該当期間のデータがありません。")
             return
+
+        total_seconds_all = sum(row["total_seconds"] for row in rows)
+        total_hours = total_seconds_all // 3600
+        total_minutes = (total_seconds_all % 3600) // 60
+        print(f"全メンバー合計: {total_seconds_all}秒 ({total_hours}時間{total_minutes}分)")
+        print("-" * 50)
 
         for row in rows:
             seconds = row["total_seconds"]

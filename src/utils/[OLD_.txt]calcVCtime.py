@@ -45,6 +45,12 @@ result_array = sorted(
 )
 
 # 出力（任意）
+total_seconds_all = sum(seconds for _, seconds in result_array)
+total_hours = total_seconds_all // 3600
+total_minutes = (total_seconds_all % 3600) // 60
+print(f"全メンバー合計: {total_seconds_all}秒 ({total_hours}時間{total_minutes}分)")
+print("-" * 50)
+
 for name, seconds in result_array:
     minutes = seconds // 60
     print(f"{name}: {seconds}秒 ({minutes}分)")
