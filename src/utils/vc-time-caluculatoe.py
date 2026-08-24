@@ -12,7 +12,7 @@ lect = """
 by くろむ, ロロ, くしらっちょ, Sora_339
 """
 pattern = (
-    r"^(?P<date>\d{2}/\d{2})_(?P<start>\d{2}:\d{2})~(?P<end>\d{2}:\d{2})\s*\n"
+    r"^(?P<date>\d{2}/\d{2})_(?P<start>\d{1,2}:\d{2})~(?P<end>\d{1,2}:\d{2})\s*\n"
     r"(?P<title>[^\n]+)\n"
     r"(?:(?P<description>.*?)\n)?"
     r"by\s+(?P<organizer>[^\n]+)\s*$"
@@ -28,10 +28,31 @@ date_str = match.group("date")
 start_time_str = match.group("start")
 end_time_str = match.group("end")
 title = match.group("title")
-start_time_jst_str = f"{year}/{date_str}-{start_time_str}:00"
-end_time_jst_str = f"{year}/{date_str}-{end_time_str}:00"
-start_time_jst = datetime.strptime(start_time_jst_str, "%Y/%m/%d-%H:%M:%S").replace(tzinfo=JST)
-end_time_jst = datetime.strptime(end_time_jst_str, "%Y/%m/%d-%H:%M:%S").replace(tzinfo=JST)
+
+
+def parse_extended_datetime(date_str, time_str):
+    """24:00以降の時刻を翌日以降へ繰り上げて日時に変換する。"""
+    try:
+        base_date = datetime.strptime(f"{year}/{date_str}", "%Y/%m/%d").replace(tzinfo=JST)
+        hour_str, minute_str = time_str.split(":")
+        hour = int(hour_str)
+        minute = int(minute_str)
+    except (ValueError, TypeError) as error:
+        raise ValueError(f"日付または時刻の形式が不正です: {date_str} {time_str}") from error
+
+    if not 0 <= hour <= 47 or not 0 <= minute <= 59:
+        raise ValueError(f"時刻は00:00から47:59の範囲で指定してください: {time_str}")
+
+    return base_date + timedelta(hours=hour, minutes=minute)
+
+
+start_time_jst = parse_extended_datetime(date_str, start_time_str)
+end_time_jst = parse_extended_datetime(date_str, end_time_str)
+if end_time_jst <= start_time_jst:
+    raise ValueError("終了時刻は開始時刻より後に指定してください")
+
+start_time_jst_str = start_time_jst.strftime("%Y/%m/%d-%H:%M:%S")
+end_time_jst_str = end_time_jst.strftime("%Y/%m/%d-%H:%M:%S")
 start_time_utc = start_time_jst.astimezone(timezone.utc)
 end_time_utc = end_time_jst.astimezone(timezone.utc)
 
